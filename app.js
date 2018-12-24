@@ -60,7 +60,8 @@ const uiController = (function() {
     getInput: () => {
       const type = document.querySelector('.add__type').value;
       const description = document.querySelector('.add__description').value;
-      const value = document.querySelector('.add__value').value;
+      // The value is a string convert it to float
+      const value = parseFloat(document.querySelector('.add__value').value);
 
       return {
         type,
@@ -121,23 +122,31 @@ const controller = (function(budgetCtrl, uiCtrl) {
   const ctrlAddItem = () => {
     //TODO 1) get the input data
     const inputData = uiCtrl.getInput();
-    // pass the data to budget controller (update the budget)
-    const addedItem = budgetCtrl.addItem(
-      inputData.type,
-      inputData.description,
-      inputData.value
-    );
-    // pass data to ui controller and update ui
-    uiCtrl.addListItem(addedItem, inputData.type);
-    uiCtrl.clearFields();
 
-    // For testing purpose
-    console.log(inputData, addedItem);
-    budgetController.logData();
+    // Check if the input data is valid
+    if (
+      inputData.description !== '' &&
+      !isNaN(inputData.value) &&
+      inputData.value > 0
+    ) {
+      // pass the data to budget controller (update the budget)
+      const addedItem = budgetCtrl.addItem(
+        inputData.type,
+        inputData.description,
+        inputData.value
+      );
+      // pass data to ui controller and update ui
+      uiCtrl.addListItem(addedItem, inputData.type);
+      uiCtrl.clearFields();
+
+      // For testing purpose
+      console.log(inputData, addedItem);
+      budgetController.logData();
+    }
   };
 
+  // Attach event listeners
   document.querySelector('.add__btn').addEventListener('click', ctrlAddItem);
-
   document.addEventListener('keypress', event => {
     if (event.keyCode === 13) {
       ctrlAddItem();
