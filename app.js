@@ -67,6 +67,42 @@ const uiController = (function() {
         description,
         value
       };
+    },
+    addListItem: (item, type) => {
+      let html, element;
+
+      if (type === 'inc') {
+        html = `<div class="item clearfix" id="income-%id">
+        <div class="item__description">%description%</div>
+        <div class="right clearfix">
+            <div class="item__value">+ %value%</div>
+            <div class="item__delete">
+                <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+            </div>
+        </div>
+    </div>`;
+        element = '.income__list';
+      } else if (type === 'exp') {
+        html = `<div class="item clearfix" id="expense-%id%">
+        <div class="item__description">%description%</div>
+        <div class="right clearfix">
+            <div class="item__value">- %value%</div>
+            <div class="item__percentage">21%</div>
+            <div class="item__delete">
+                <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+            </div>
+        </div>
+    </div>`;
+        element = '.expenses__list';
+      }
+
+      // Update the html string with the item data
+      let newHtml = html.replace('%id%', item.id);
+      newHtml = newHtml.replace('%description%', item.description);
+      newHtml = newHtml.replace('%value%', item.value);
+
+      // Insert the newHtml string to the dom
+      document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
     }
   };
 })();
@@ -75,14 +111,14 @@ const controller = (function(budgetCtrl, uiCtrl) {
   const ctrlAddItem = () => {
     //TODO 1) get the input data
     const inputData = uiCtrl.getInput();
-    // pass the data to budget controller
+    // pass the data to budget controller (update the budget)
     const addedItem = budgetCtrl.addItem(
       inputData.type,
       inputData.description,
       inputData.value
     );
-    // and ui controller
-    // update the budget and then update the ui
+    // pass data to ui controller and update ui
+    uiCtrl.addListItem(addedItem, inputData.type);
 
     // For testing purpose
     console.log(inputData, addedItem);
