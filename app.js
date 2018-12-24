@@ -103,6 +103,16 @@ const uiController = (function() {
 
       // Insert the newHtml string to the dom
       document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+    },
+    clearFields: () => {
+      const list = document.querySelectorAll(
+        '.add__description' + ', ' + '.add__value'
+      );
+      Array.prototype.forEach.call(list, element => {
+        element.value = '';
+      });
+
+      list[0].focus();
     }
   };
 })();
@@ -119,6 +129,7 @@ const controller = (function(budgetCtrl, uiCtrl) {
     );
     // pass data to ui controller and update ui
     uiCtrl.addListItem(addedItem, inputData.type);
+    uiCtrl.clearFields();
 
     // For testing purpose
     console.log(inputData, addedItem);
