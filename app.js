@@ -9,6 +9,16 @@ const budgetController = (function() {
     );
   }
 
+  function calcTotal(type) {
+    let sum = 0;
+
+    data.allItems[type].forEach(dataItem => {
+      sum += dataItem.value;
+    });
+
+    data.totals[type] = sum;
+  }
+
   const Expense = function(id, description, value) {
     this.id = id;
     this.description = description;
@@ -28,7 +38,9 @@ const budgetController = (function() {
     totals: {
       exp: 0,
       inc: 0
-    }
+    },
+    budget: 0, // income - expense
+    percentExpense: -1
   };
 
   return {
@@ -49,6 +61,31 @@ const budgetController = (function() {
       data.allItems[type].push(newItem);
       // Return newly created object
       return newItem;
+    },
+    setBudget: () => {
+      // Calculate total income and expenses
+      calcTotal('exp');
+      calcTotal('inc');
+
+      // Calculate the budget (income - expense)
+      data.budget = data.totals['inc'] - data.totals['exp'];
+
+      // Calculate the percent of expenses
+      if (data.totals['inc'] > 0) {
+        data.percentExpense = Math.round(
+          (data.totals['exp'] / data.totals['inc']) * 100
+        );
+      } else {
+        data.percentExpense = -1;
+      }
+    },
+    getBudget: () => {
+      return {
+        budget: data.budget,
+        totalExp: data.totals['exp'],
+        totalInc: data.totals['inc'],
+        percentExpense: data.percentExpense
+      };
     },
 
     logData: () => console.log(data)
@@ -139,10 +176,24 @@ const controller = (function(budgetCtrl, uiCtrl) {
       uiCtrl.addListItem(addedItem, inputData.type);
       uiCtrl.clearFields();
 
+      // update the budget
+      updateBudget();
+
       // For testing purpose
       console.log(inputData, addedItem);
       budgetController.logData();
     }
+  };
+
+  const updateBudget = () => {
+    // Set the budgets
+    budgetController.setBudget();
+
+    // return the calculated budgets
+    const budget = budgetController.getBudget();
+
+    // Update the ui with budget values;
+    console.log('budget: ', budget);
   };
 
   // Attach event listeners
