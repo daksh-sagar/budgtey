@@ -151,6 +151,22 @@ const uiController = (function() {
       });
 
       list[0].focus();
+    },
+    displayBudget: obj => {
+      // .budget__value .budget__income--value .budget__expenses--value  .budget__expenses--percentage
+      document.querySelector('.budget__value').textContent = obj.budget;
+      document.querySelector('.budget__income--value').textContent =
+        obj.totalInc;
+      document.querySelector('.budget__expenses--value').textContent =
+        obj.totalExp;
+
+      if (obj.percentExpense > 0) {
+        document.querySelector('.budget__expenses--percentage').textContent =
+          obj.percentExpense + '%';
+      } else {
+        document.querySelector('.budget__expenses--percentage').textContent =
+          '---';
+      }
     }
   };
 })();
@@ -193,7 +209,8 @@ const controller = (function(budgetCtrl, uiCtrl) {
     const budget = budgetController.getBudget();
 
     // Update the ui with budget values;
-    console.log('budget: ', budget);
+    uiController.displayBudget(budget);
+    // console.log('budget: ', budget);
   };
 
   // Attach event listeners
@@ -202,5 +219,11 @@ const controller = (function(budgetCtrl, uiCtrl) {
     if (event.keyCode === 13) {
       ctrlAddItem();
     }
+  });
+  uiController.displayBudget({
+    budget: 0,
+    totalExp: 0,
+    totalInc: 0,
+    percentExpense: -1
   });
 })(budgetController, uiController);
