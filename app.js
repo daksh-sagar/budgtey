@@ -87,6 +87,9 @@ const budgetController = (function() {
         percentExpense: data.percentExpense
       };
     },
+    deleteItem: (type, id) => {
+      data.allItems[type] = data.allItems[type].filter(item => item.id !== id);
+    },
 
     logData: () => console.log(data)
   };
@@ -110,7 +113,7 @@ const uiController = (function() {
       let html, element;
 
       if (type === 'inc') {
-        html = `<div class="item clearfix" id="income-%id">
+        html = `<div class="item clearfix" id="inc_%id%">
         <div class="item__description">%description%</div>
         <div class="right clearfix">
             <div class="item__value">+ %value%</div>
@@ -121,7 +124,7 @@ const uiController = (function() {
     </div>`;
         element = '.income__list';
       } else if (type === 'exp') {
-        html = `<div class="item clearfix" id="expense-%id%">
+        html = `<div class="item clearfix" id="exp_%id%">
         <div class="item__description">%description%</div>
         <div class="right clearfix">
             <div class="item__value">- %value%</div>
@@ -167,6 +170,10 @@ const uiController = (function() {
         document.querySelector('.budget__expenses--percentage').textContent =
           '---';
       }
+    },
+    deleteListItem: selectorId => {
+      const el = document.getElementById(selectorId);
+      el.parentNode.removeChild(el);
     }
   };
 })();
@@ -201,6 +208,23 @@ const controller = (function(budgetCtrl, uiCtrl) {
     }
   };
 
+  const ctrlDeleteItem = event => {
+    const itemId = event.target.parentNode.parentNode.parentNode.parentNode.id;
+
+    if (itemId) {
+      const split = itemId.split('_');
+      const type = split[0];
+      const id = split[1];
+
+      // delete the item from data struct
+      budgetCtrl.deleteItem(type, id);
+      // delete the item from the budget
+      uiCtrl.deleteListItem(itemId);
+      // show the updated budget
+      updateBudget();
+    }
+  };
+
   const updateBudget = () => {
     // Set the budgets
     budgetController.setBudget();
@@ -220,6 +244,11 @@ const controller = (function(budgetCtrl, uiCtrl) {
       ctrlAddItem();
     }
   });
+
+  document
+    .querySelector('.container')
+    .addEventListener('click', ctrlDeleteItem);
+
   uiController.displayBudget({
     budget: 0,
     totalExp: 0,
