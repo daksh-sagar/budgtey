@@ -214,6 +214,29 @@ const uiController = (function() {
           item.textContent = '---';
         }
       });
+    },
+    displayYear: () => {
+      const months = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+      ];
+      const now = new Date();
+      const thisMonth = months[now.getMonth()];
+      const year = now.getFullYear();
+      // const month = now.getMonth();
+
+      document.querySelector('.budget__title--month').textContent =
+        thisMonth + ' ' + year;
     }
   };
 })();
@@ -304,10 +327,12 @@ const controller = (function(budgetCtrl, uiCtrl) {
     .querySelector('.container')
     .addEventListener('click', ctrlDeleteItem);
 
-  uiController.displayBudget({
+  uiCtrl.displayBudget({
     budget: 0,
     totalExp: 0,
     totalInc: 0,
     percentExpense: -1
   });
+
+  uiCtrl.displayYear();
 })(budgetController, uiController);
