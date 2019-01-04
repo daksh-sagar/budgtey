@@ -23,7 +23,21 @@ const budgetController = (function() {
     this.id = id;
     this.description = description;
     this.value = value;
+    this.percentage = -1;
   };
+
+  Expense.prototype.setPercentage = function(totalIncome) {
+    if (totalIncome > 0) {
+      this.percentage = Math.round((this.value / totalIncome) * 100);
+    } else {
+      this.percentage = -1;
+    }
+  };
+
+  Expense.prototype.getPercentage = function() {
+    return this.percentage;
+  };
+
   const Income = function(id, description, value) {
     this.id = id;
     this.description = description;
@@ -89,6 +103,15 @@ const budgetController = (function() {
     },
     deleteItem: (type, id) => {
       data.allItems[type] = data.allItems[type].filter(item => item.id !== id);
+    },
+    setPercentages: () => {
+      data.allItems.exp.forEach(item => item.setPercentage(data.totals.inc));
+    },
+    getPercentages: () => {
+      const allPercentages = data.allItems.exp.map(item =>
+        item.getPercentage()
+      );
+      return allPercentages;
     },
 
     logData: () => console.log(data)
@@ -174,6 +197,23 @@ const uiController = (function() {
     deleteListItem: selectorId => {
       const el = document.getElementById(selectorId);
       el.parentNode.removeChild(el);
+    },
+    displayPercentages: percentages => {
+      const fields = document.querySelectorAll('.item__percentage'); //this returns a nodelist
+
+      function nodeListForEach(list, callback) {
+        for (let i = 0; i < list.length; i += 1) {
+          callback(list[i], i);
+        }
+      }
+
+      nodeListForEach(fields, (item, index) => {
+        if (percentages[index] > 0) {
+          item.textContent = percentages[index] + '%';
+        } else {
+          item.textContent = '---';
+        }
+      });
     }
   };
 })();
@@ -202,6 +242,9 @@ const controller = (function(budgetCtrl, uiCtrl) {
       // update the budget
       updateBudget();
 
+      // update the percentages
+      updatePercentages();
+
       // For testing purpose
       console.log(inputData, addedItem);
       budgetController.logData();
@@ -222,6 +265,8 @@ const controller = (function(budgetCtrl, uiCtrl) {
       uiCtrl.deleteListItem(itemId);
       // show the updated budget
       updateBudget();
+      // update percentages
+      updatePercentages();
     }
   };
 
@@ -235,6 +280,16 @@ const controller = (function(budgetCtrl, uiCtrl) {
     // Update the ui with budget values;
     uiController.displayBudget(budget);
     // console.log('budget: ', budget);
+  };
+
+  const updatePercentages = () => {
+    // Calc percentages
+    budgetCtrl.setPercentages();
+    // Read percentages from the budget controller
+    const percentages = budgetCtrl.getPercentages();
+    console.log(percentages);
+    // update the ui with new percentages
+    uiCtrl.displayPercentages(percentages);
   };
 
   // Attach event listeners
