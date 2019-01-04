@@ -112,9 +112,9 @@ const budgetController = (function() {
         item.getPercentage()
       );
       return allPercentages;
-    },
+    }
 
-    logData: () => console.log(data)
+    // logData: () => console.log(data)
   };
 })();
 
@@ -233,7 +233,6 @@ const uiController = (function() {
       const now = new Date();
       const thisMonth = months[now.getMonth()];
       const year = now.getFullYear();
-      // const month = now.getMonth();
 
       document.querySelector('.budget__title--month').textContent =
         thisMonth + ' ' + year;
@@ -269,8 +268,8 @@ const controller = (function(budgetCtrl, uiCtrl) {
       updatePercentages();
 
       // For testing purpose
-      console.log(inputData, addedItem);
-      budgetController.logData();
+      // console.log(inputData, addedItem);
+      // budgetController.logData();
     }
   };
 
@@ -310,7 +309,7 @@ const controller = (function(budgetCtrl, uiCtrl) {
     budgetCtrl.setPercentages();
     // Read percentages from the budget controller
     const percentages = budgetCtrl.getPercentages();
-    console.log(percentages);
+    // console.log(percentages);
     // update the ui with new percentages
     uiCtrl.displayPercentages(percentages);
   };
